@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map Viewer</title>
+</head>
+<body>
+<h1>Map Viewer</h1>
+<hr>
+<form id="mapview">
+<fieldset>
+<legend>マップの表示を確認する</legend>
+<label for="map">マップファイル:</label>
+<input type="file" id="map" accept="application/json" required>
+</fieldset>
+</form>
+<hr>
+<output><img id="output"></output>
+<script src="js/mkng.js"></script>
+<script>
+'use strict';
+document.forms.mapview.map.addEventListener('change', async e => {
+	const map = await MKNG.fetchMapData(
+		await MKNG.dev.fileToDataURL(e.target.files[0]));
+	const cv = document.createElement('canvas');
+	const ctx = cv.getContext('2d');
+	[ cv.width, cv.height ] = [ map.width * 16, map.height * 16 ];
+	const chip = MKNG.imageToMapChip(await MKNG.readImage(map.chip));
+	const alt = ctx.createImageData(16, 16);
+	for (let y = 0; y < map.height; y++)
+		for (let x = 0; x < map.width; x++)
+			ctx.putImageData(
+				chip[map.data[y * map.width + x]] || alt,
+				x * 16, y * 16);
+	document.getElementById('output').src = cv.toDataURL();
+});
+</script>
+<hr>
+<footer>
+<small>Map Viewer &copy; 2021 KusaReMKN. All Rights Reserved.</small>
+</footer>
+</body>
+</html>

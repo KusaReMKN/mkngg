@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>標準マップファイル</title>
+<style>
+* { box-sizing: border-box; }
+body { max-width: 800px; margin: auto; padding: 1rem; }
+table td, table th { border: ridge 2px; padding: 0 8px; }
+</style>
+</head>
+<body>
+<header>
+<h1>標準マップチップ</h1>
+</header>
+<section>
+<h2>標準マップチップに含まれるブロック一覧</h2>
+<ul>
+<li>[0, 16) と [32, 48) は通行不可ブロックです。</li>
+<li>厳密には <code>!(<var>n</var> &gt;&gt; 3 &amp; 1)</code> が真となる
+	番号 <var>n</var> は通行不可ブロックです。</li>
+</ul>
+<div style="display: flex; justify-content: space-around;">
+<table style="width: 45%;">
+<thead>
+<tr><th>番号</th><th>画像</th><th>説明</th></tr>
+</thead>
+<tbody>
+<tr><td>00</td><td id="sm-00"></td><td>海 (四方に陸無し)</td></tr>
+<tr><td>01</td><td id="sm-01"></td><td>海 (上に陸)</td></tr>
+<tr><td>02</td><td id="sm-02"></td><td>海 (左に陸)</td></tr>
+<tr><td>03</td><td id="sm-03"></td><td>海 (上と左に陸)</td></tr>
+<tr><td>04</td><td id="sm-04"></td><td>海 (下に陸)</td></tr>
+<tr><td>05</td><td id="sm-05"></td><td>海 (上下に陸)</td></tr>
+<tr><td>06</td><td id="sm-06"></td><td>海 (下と左に陸)</td></tr>
+<tr><td>07</td><td id="sm-07"></td><td>海 (上下と左に陸)</td></tr>
+<tr><td>08</td><td id="sm-08"></td><td>海 (右に陸)</td></tr>
+<tr><td>09</td><td id="sm-09"></td><td>海 (上と右に陸)</td></tr>
+<tr><td>10</td><td id="sm-10"></td><td>海 (左右に陸)</td></tr>
+<tr><td>11</td><td id="sm-11"></td><td>海 (上と左右に陸)</td></tr>
+<tr><td>12</td><td id="sm-12"></td><td>海 (下と右に陸)</td></tr>
+<tr><td>13</td><td id="sm-13"></td><td>海 (上下と右に陸)</td></tr>
+<tr><td>14</td><td id="sm-14"></td><td>海 (下と左右に陸)</td></tr>
+<tr><td>15</td><td id="sm-15"></td><td>海 (四方に陸)</td></tr>
+<tr><td>16</td><td id="sm-16"></td><td>平地</td></tr>
+<tr><td>17</td><td id="sm-17"></td><td>草</td></tr>
+<tr><td>18</td><td id="sm-18"></td><td>木</td></tr>
+<tr><td>19</td><td id="sm-19"></td><td>山</td></tr>
+<tr><td>20</td><td id="sm-20"></td><td>平地 (雪)</td></tr>
+<tr><td>21</td><td id="sm-21"></td><td>草 (雪)</td></tr>
+<tr><td>22</td><td id="sm-22"></td><td>木 (雪)</td></tr>
+<tr><td>23</td><td id="sm-23"></td><td>山 (雪)</td></tr>
+<tr><td>24</td><td id="sm-24"></td><td>砂</td></tr>
+<tr><td>25</td><td id="sm-25"></td><td>橋</td></tr>
+<tr><td>26</td><td id="sm-26"></td><td>階段</td></tr>
+<tr><td>27</td><td id="sm-27"></td><td>割り当てなし</td></tr>
+<tr><td>28</td><td id="sm-28"></td><td>割り当てなし</td></tr>
+<tr><td>29</td><td id="sm-29"></td><td>割り当てなし</td></tr>
+<tr><td>30</td><td id="sm-30"></td><td>割り当てなし</td></tr>
+<tr><td>31</td><td id="sm-31"></td><td>割り当てなし</td></tr>
+</tbody>
+</table>
+<table style="width: 45%;">
+<thead>
+<tr><th>番号</th><th>画像</th><th>説明</th></tr>
+</thead>
+<tbody>
+<tr><td>32</td><td id="sm-32"></td><td>海岩</td></tr>
+<tr><td>33</td><td id="sm-33"></td><td>滝 1</td></tr>
+<tr><td>34</td><td id="sm-34"></td><td>滝 2</td></tr>
+<tr><td>35</td><td id="sm-35"></td><td>水</td></tr>
+<tr><td>36</td><td id="sm-36"></td><td>水門</td></tr>
+<tr><td>37</td><td id="sm-37"></td><td>割り当てなし</td></tr>
+<tr><td>38</td><td id="sm-38"></td><td>割り当てなし</td></tr>
+<tr><td>39</td><td id="sm-39"></td><td>割り当てなし</td></tr>
+<tr><td>40</td><td id="sm-40"></td><td>岩山</td></tr>
+<tr><td>41</td><td id="sm-41"></td><td>崖</td></tr>
+<tr><td>42</td><td id="sm-42"></td><td>看板</td></tr>
+<tr><td>43</td><td id="sm-43"></td><td>割り当てなし</td></tr>
+<tr><td>44</td><td id="sm-44"></td><td>岩山 (雪)</td></tr>
+<tr><td>45</td><td id="sm-45"></td><td>割り当てなし</td></tr>
+<tr><td>46</td><td id="sm-46"></td><td>割り当てなし</td></tr>
+<tr><td>47</td><td id="sm-47"></td><td>割り当てなし</td></tr>
+<tr><td>48</td><td id="sm-48"></td><td>家 (小)</td></tr>
+<tr><td>49</td><td id="sm-49"></td><td>家 (小) (雪)</td></tr>
+<tr><td>50</td><td id="sm-50"></td><td>洞窟</td></tr>
+<tr><td>51</td><td id="sm-51"></td><td>洞窟 (雪)</td></tr>
+<tr><td>52</td><td id="sm-52"></td><td>毒</td></tr>
+<tr><td>53</td><td id="sm-53"></td><td>氷</td></tr>
+<tr><td>54</td><td id="sm-54"></td><td>ダンジョン</td></tr>
+<tr><td>55</td><td id="sm-55"></td><td>割り当てなし</td></tr>
+<tr><td>56</td><td id="sm-56"></td><td>街 (左)</td></tr>
+<tr><td>57</td><td id="sm-57"></td><td>街 (右)</td></tr>
+<tr><td>58</td><td id="sm-58"></td><td>城 (左上)</td></tr>
+<tr><td>59</td><td id="sm-59"></td><td>城 (左下)</td></tr>
+<tr><td>60</td><td id="sm-60"></td><td>城 (右上)</td></tr>
+<tr><td>61</td><td id="sm-61"></td><td>城 (右下)</td></tr>
+<tr><td>62</td><td id="sm-62"></td><td>塔 (上)</td></tr>
+<tr><td>63</td><td id="sm-63"></td><td>塔 (下)</td></tr>
+</tbody>
+</table>
+</div>
+<script>
+'use strict';
+
+// マップチップ画像から各ブロックを切り出す
+const createMapChipArray = img => {
+	const cv = document.createElement('canvas');
+	const ctx = cv.getContext('2d');
+	[ cv.width, cv.height ] = [ img.width, img.height ];
+	ctx.drawImage(img, 0, 0);
+	const result = new Array();
+	for (let i = 0; i < cv.height; i += 16)
+		result.push(ctx.getImageData(0, i, 16, 16));
+	return result;
+};
+
+// 画像を読み込む
+const readImage = async src => new Promise(r => {
+	const img = new Image();
+	img.addEventListener('load', () => r(img));
+	img.src = src;
+});
+
+// プレビューを表示
+const preview = async () => {
+	// マップチップ生成
+	const mapChip = createMapChipArray(await readImage('./stdchip.png'));
+
+	// 作業用 canvas 用意
+	const cv = document.createElement('canvas');
+	const ctx = cv.getContext('2d');
+	[ cv.width, cv.height ] = [ 16, 16 ];
+
+	for (let i = 0; i < 64; i++) {
+		ctx.putImageData(mapChip[i], 0, 0);
+		const img = new Image();
+		img.src = ctx.canvas.toDataURL();
+		document.getElementById('sm-' + ('00' + i).slice(-2))
+			.appendChild(img);
+	}
+};
+preview();
+</script>
+<hr>
+<footer>
+<small>stdchip &copy; 2021 KusaReMKN.  All Rights Reserved.</small>
+</footer>
+</body>
+</html>

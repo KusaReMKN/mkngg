@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Map Editor</title>
+</head>
+<style>
+#mapchips img { width: 32px; }
+</style>
+<body>
+<h1>Map Editor</h1>
+<hr>
+<form id="mapedit">
+<fieldset>
+<legend>マップファイルを読み込む</legend>
+<label for="map">マップファイル:</label>
+<input type="file" id="map" accept="application/json">
+</fieldset>
+</form>
+<form id="mapinfo">
+<fieldset>
+<legend>マップの情報</legend>
+<label for="chip">マップチップ名:</label>
+<input type="text" id="chip" value="mapchip/stdchip.png" readonly>
+<label for="width">マップの横幅:</label>
+<input type="number" id="width" step="1" min="1" max="256" value="40">
+<label for="height">マップの高さ:</label>
+<input type="number" id="height" step="1" min="1" max="256" value="40">
+</fieldset>
+</form>
+<form id="mapsave" onsubmit="return false;">
+<fieldset>
+<legend>マップを保存</legend>
+<button id="save">json 形式で保存</button>
+</fieldset>
+</form>
+<hr>
+<form id="tools" onsubmit="return false;">
+<fieldset>
+<legend>ツール</legend>
+<label><input type="radio" name="tool" value="pen" checked>点・線</label>
+<label><input type="radio" name="tool" value="bucket">バケツ</label>
+<br>
+<button id="simplesea">陸と海の境界を無効</button>
+<button id="normalsea">海を陸地にフィット</button>
+</fieldset>
+</form>
+<form id="palette">
+<fieldset>
+<legend>パレット</legend>
+<div id="mapchips" style="display: flex; flex-wrap: wrap;"></div>
+</fieldset>
+</form>
+<hr>
+<canvas id="cv"></canvas>
+<script src="js/mkng.js"></script>
+<script>
+'use strict';
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let [ width, height ] = [ 0, 0 ];
+let mapdata = [ new Array() ];
+let chip = new Array();
+let alt;
+
+const update = async (e, y) => {
+	if (e && y) {
+		ctx.putImageData(chip[mapdata[y][e]] || alt, e * 16, y * 16);
+	} else if (e) {
+		width = +document.forms.mapinfo.width.value;
+		height = +document.forms.mapinfo.height.value;
+		if (mapdata[0].length < width)
+			for (let y = 0; y < mapdata.length; y++)
+				mapdata[y].length = width;
+		if (mapdata.length < height) {
+			const app = new Array();
+			for (let i = mapdata.length; i < height; i++)
+				app.push(new Array(mapdata[0].length));
+			mapdata = mapdata.concat(app);
+		}
+		chip = MKNG.imageToMapChip(
+			await MKNG.readImage(
+				document.forms.mapinfo.chip.value));
+		alt = MKNG.imageToMapChip(
+			await MKNG.readImage('dev/unkchip.png'))[0];
+		createPalette();
+		[ cv.width, cv.height ] = [ width * 16, height * 16 ];
+	}
+	for (let y = 0; y < height; y++)
+		for (let x = 0; x < width; x++)
+			ctx.putImageData(
+				chip[mapdata[y][x]] || alt, x * 16, y * 16);
+};
+
+const createPalette = async () => {
+	const div = document.getElementById('mapchips');
+	div.innerHTML = '';
+	for (let i = 0; i < chip.length; i++) {
+		const label = document.createElement('label');
+		const radio = document.createElement('input');
+		[ radio.type, radio.name, radio.id, radio.value ] =
+			[ 'radio', 'mapchip', `mc-${i}`, i ];
+		const img = await MKNG.dev.imageDataToImage(chip[i]);
+		label.appendChild(radio);
+		label.appendChild(img);
+		div.appendChild(label);
+	}
+	document.forms.palette.mapchip.value = 0;
+};
+
+document.forms.mapedit.map.addEventListener('change', async e => {
+	const map = await MKNG.fetchMapData(
+		await MKNG.dev.fileToDataURL(e.target.files[0]));
+	document.forms.mapinfo.chip.value = map.chip;
+	document.forms.mapinfo.width.value = width = map.width;
+	document.forms.mapinfo.height.value = height = map.height;
+	mapdata = [];
+	for (let y = 0; y < height * width; y += width)
+		mapdata.push(map.data.slice(y, y + width));
+	update(true);
+});
+document.forms.mapinfo.chip.addEventListener('change', update);
+document.forms.mapinfo.width.addEventListener('change', update);
+document.forms.mapinfo.height.addEventListener('change', update);
+
+document.forms.mapsave.save.addEventListener('click', () => {
+	const obj = {
+		width: width, height: height,
+		chip: document.forms.mapinfo.chip.value,
+		data: new Array()
+	};
+	for (let y = 0; y < height; y++)
+		obj.data = obj.data.concat(mapdata[y].slice(0, width));
+	const blob =
+		new Blob([JSON.stringify(obj)], { type: 'application/json' });
+	const a = document.createElement('a');
+	a.href = URL.createObjectURL(blob);
+	a.download = 'mkng-map-' + Date.now() + '.json';
+	a.click();
+});
+
+document.forms.tools.simplesea.addEventListener('click', () => {
+	for (let y = 0; y < mapdata.length; y++)
+		for (let x = 0; x < mapdata[0].length; x++)
+			if (mapdata[y][x] < 16)
+				mapdata[y][x] = 0;
+	update();
+});
+document.forms.tools.normalsea.addEventListener('click', () => {
+	for (let y = 0; y < mapdata.length; y++)
+		for (let x = 0; x < mapdata[0].length; x++) {
+			if (mapdata[y][x] < 16) {
+				let n = 0;
+				if ((mapdata[y - 1] || [])[x] >= 16) n |= 1;
+				if ((mapdata[y] || [])[x - 1] >= 16) n |= 2;
+				if ((mapdata[y + 1] || [])[x] >= 16) n |= 4;
+				if ((mapdata[y] || [])[x + 1] >= 16) n |= 8;
+				mapdata[y][x] = n;
+			}
+		}
+	update();
+});
+let drawing = false;
+const fill = (() => {
+	const stack = new Array();
+	return (x, y, c, d) => {
+		stack.push([x, y]);
+		while (stack.length) {
+			const [ x, y ] = stack.pop();
+			if (0 <= x && x < width && 0 <= y && y < height &&
+					mapdata[y][x] === c) {
+				mapdata[y][x] = d;
+				stack.push([x - 1, y], [x, y - 1]);
+				stack.push([x + 1, y], [x, y + 1]);
+			}
+		}
+	};
+})();
+const drawHandle = e => {
+	const pen = +document.forms.palette.mapchip.value;
+	const handlers = {
+		mousedown: (x, y) => {
+			if (document.forms.tools.tool.value === 'pen') {
+				drawing = true;
+				if (x < width && y < height)
+					mapdata[y][x] = pen, update(x, y);
+			} else {
+				if (pen === mapdata[y][x]) return;
+				const stack = new Array();
+				fill(x, y, mapdata[y][x], pen), update();
+			}
+		},
+		mousemove: (x, y) => {
+			e.target.title = `(${x}, ${y})`;
+			if (x < width && y < height && drawing)
+				mapdata[y][x] = pen, update(x, y);
+		},
+		mouseup: () => {
+			drawing = false;
+		},
+	};
+	console.log(e.type);
+	const [ x, y ] = [ e.offsetX >> 4, e.offsetY >> 4 ];
+	(handlers[e.type] || (() => 0))(x, y);
+};
+cv.addEventListener('mousedown', drawHandle);
+cv.addEventListener('mousemove', drawHandle);
+cv.addEventListener('contextmenu', () => drawing = false);
+window.addEventListener('mouseup', drawHandle);
+
+update(true);
+</script>
+<hr>
+<footer>
+<small>Map Editor &copy; 2021 KusaReMKN. All Rights Reserved.</small>
+</footer>
+</body>
+</html>
